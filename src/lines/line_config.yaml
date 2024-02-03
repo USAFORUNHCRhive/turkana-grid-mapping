@@ -1,0 +1,41 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+dataprep:
+  line_vector_file: '~/usa4unhcr/usa4unhcr_line_train_val_labels_121123.geojson'
+  data_splits: ['train', 'val']
+  num_workers: 4
+datamodule:
+  root_dir: '~/usa4unhcr/'
+  chip_size: 512
+  num_chips_per_tile: 300
+  num_workers: 12
+  batch_size: 8
+  segm_filter_size: 8 
+  img_mean: [75.006010333223,68.318348580367,63.633123192871]
+  img_std: [76.842842915691,70.10749190534,65.514465248706]
+learning:
+  model: 'line_unet' # 'unet', 'line_unet'
+  in_channels: 3
+  num_classes: 2
+  stride: 1
+  use_maxpool: True
+  learning_rate: 1e-5
+  learning_rate_schedule_patience: 5
+  early_stopping_patience: 40
+  loss: 'ce'
+  loss_weights: [0.2, 0.8]
+  ignore_index: -1000
+trainer:
+  accelerator: 'gpu'
+  min_epochs: 6
+  max_epochs: 300
+  log_every_n_steps: 10
+evaluation:
+  method_name: 'baseline'
+inference:
+  output_dir: '~/usa4unhcr/line_results/'
+  batch_size: 8
+  num_workers: 4
+  test_image_dir: '~/usa4unhcr/line_test_images/'
+  padding: 10
+  chip_size: 256

@@ -1,0 +1,38 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+dataprep:
+  pole_vector_file: '~/usa4unhcr/usa4unhcr_poles_train_labels_with_kakuma_09252023.geojson' #
+  data_splits: ['train', 'val']
+  num_workers: 4
+datamodule:
+  root_dir: '~/usa4unhcr/'
+  chip_size: 512
+  num_chips_per_tile: 30
+  num_workers: 12
+  batch_size: 1
+  img_mean: [75.006010333223,68.318348580367,63.633123192871]
+  img_std: [76.842842915691,70.10749190534,65.514465248706]
+learning:
+  model: 'fcn8' 
+  in_channels: 3
+  num_classes: 1
+  learning_rate: 1e-6
+  learning_rate_schedule_patience: 5
+  early_stopping_patience: 30
+  loss: 'lcfcn'
+  prob_threshold: 0.5
+trainer:
+  accelerator: 'gpu'
+  min_epochs: 6
+  max_epochs: 300
+  log_every_n_steps: 10
+evaluation:
+  method_name: 'pole_demo'
+inference:
+  output_dir: '~/ssdshared/simone_datasets/usa4unhcr/pole_results/'
+  batch_size: 8
+  num_workers: 4
+  test_image_dir: '~/usa4unhcr/pole_test_images/'
+  label_fn: ~/usa4unhcr/updated_unhcr_poles.geojson'
+  padding: 10
+  chip_size: 512
