@@ -1,5 +1,5 @@
 # Introduction
-** Jump to: [Setup](#setup) | [Directory Structure](#directory-structure) | [Data Acquisition](#data-acquisition) | [Sample Tutorial](#sample-tutorial) | [Acknowledgments](#acknowledgements) | [License](#license) 
+** Jump to: [Setup](#setup) | [Directory Structure](#directory-structure) | [Data Acquisition](#data-acquisition) | [Sample Tutorial](#sample-tutorial) | [Acknowledgments](#acknowledgements) | [License](#license) | [Contributing](#contributing)
 
 Mapping electrical infrastructure can support measuring access to electricity and can help identify opportunities to improve or extend exisiting power infrastructure.
 High resolution orthorectified imagery (such as drone imagery) can be used to map power distribution infrastructure. The figure below shows a sample power distribution network
@@ -83,3 +83,7 @@ This project was made possible through the collaboration of several organization
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+# Contributing
+
+If you're interested in contributing to this project check out the [contributing guide](CONTRIBUTING.md) for more details. We also welcome ideas for other ways to contribute - please reach out to hive@unrefugees.org.
