@@ -36,7 +36,7 @@ def create_and_save_mask(
     geom = box(*bounds)
     matches_shapes = []
     matches_types = []
-    # Find line strings that are in the image
+    # Find poles that are in the image
     for idx, shape in enumerate(shapes):
         warped_shape = fiona.transform.transform(
             poly_crs, img_crs, [shape["coordinates"][0]], [shape["coordinates"][1]]
@@ -46,13 +46,13 @@ def create_and_save_mask(
             matches_shapes.append(warped_shape)
             matches_types.append(types[idx])
 
-        label_data = np.zeros((img_fp.read().shape[1], img_fp.read().shape[2]))
-        data_mask = np.zeros((img_fp.read().shape[1], img_fp.read().shape[2]))
-        for i, (lon, lat) in enumerate(matches_shapes):
-            py, px = img_fp.index(lon, lat)
-            data_mask[py, px] = 1
-            if matches_types[i] == "pole":
-                label_data[py, px] = 1
+    label_data = np.zeros((img_fp.read().shape[1], img_fp.read().shape[2]))
+    data_mask = np.zeros((img_fp.read().shape[1], img_fp.read().shape[2]))
+    for i, (lon, lat) in enumerate(matches_shapes):
+        py, px = img_fp.index(lon, lat)
+        data_mask[py, px] = 1
+        if matches_types[i] == "pole":
+            label_data[py, px] = 1
 
     output_profile = img_fp.profile.copy()
     output_profile["dtype"] = "uint8"

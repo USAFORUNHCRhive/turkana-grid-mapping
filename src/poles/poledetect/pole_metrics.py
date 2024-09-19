@@ -15,6 +15,8 @@ import rasterio.mask
 from omegaconf import OmegaConf
 from rasterio.features import shapes
 from shapely.geometry import Point, Polygon, box
+from sklearn.neighbors import BallTree
+from fiona import transform
 
 
 def polygonize(preds_fn, noise_threshold=1):
@@ -46,67 +48,100 @@ def polygonize(preds_fn, noise_threshold=1):
     return results
 
 
-def get_valid_labels(image_fn, label_fn, buffer=10):
+def get_valid_labels(image_fn, label_fn):
     """Get labels that are valid for the given image
 
     Args:
         image_fn (str): Name of the image.
         label_fn (str): Name of the label vector file
-        buffer (int, optional): Buffer to apply to the labels. Defaults to 10.
     Returns:
         point_labels (dataframe): Dataframe containing valid labels within the image
     """
     src = rasterio.open(image_fn)
-    msk = src.read_masks()
-    data_msk = msk[0] & msk[1] & msk[2]
+    msk = src.read() #img_fp.read_masks() 
+    src_crs = src.crs
+    data_msk  = ((msk[0]>0) & (msk[1]>0) & (msk[2]>0)).astype(int) 
 
     valid_labels = []
     with fiona.open(label_fn, "r") as shapefile:
+        dst_crs = shapefile.crs
         shapes = [feature["geometry"] for feature in shapefile]
         bounds = src.bounds
         geom = box(*bounds)
 
         for shape in shapes:
             pt = Point(shape["coordinates"])
-            if geom.contains(pt):
-                lon, lat = shape["coordinates"]
+
+            point =  transform.transform(dst_crs,src_crs, [shape["coordinates"][0]],[shape["coordinates"][1]])
+            point = Point(point[0][0],point[1][0])
+
+            if geom.contains(point):
+                lon, lat = point.xy 
                 py, px = src.index(lon, lat)
-                if data_msk[py, px] == 255:
+                if data_msk[py, px] == 1:
                     valid_labels.append(pt)
+    valid_labels = gpd.GeoDataFrame(crs=dst_crs, geometry=valid_labels)
+    return valid_labels 
 
-    valid_labels = gpd.GeoDataFrame(crs=src.crs, geometry=valid_labels)
-    valid_labels["buffered_geometry"] = valid_labels.buffer(buffer)
-    point_labels = gpd.GeoDataFrame(
-        valid_labels, geometry=valid_labels.buffered_geometry
-    )
-    point_labels.reset_index(inplace=True)
-    geoms = point_labels.geometry.unary_union
-    point_labels = gpd.GeoDataFrame(geometry=[geoms], crs=valid_labels.crs)
-    point_labels = point_labels.explode().reset_index(drop=True)
-    return point_labels
+def get_nearest(src_points, candidates, k_neighbors=1):
+    """
+    Source: https://autogis-site.readthedocs.io/en/2019/notebooks/L3/nearest-neighbor-faster.html
+    Find nearest neighbors for all source points from a set of candidate points"""
 
+    # Create tree from the candidate points
+    tree = BallTree(candidates, leaf_size=15, metric='euclidean')
 
-def compute_tp_fp_fn(labels, preds):
+    # Find closest points and distances
+    distances, indices = tree.query(src_points, k=k_neighbors)
+
+    # Transpose to get distances and indices into arrays
+    distances = distances.transpose()
+    indices = indices.transpose()
+
+    # Get closest indices and distances (i.e. array at index 0)
+    # note: for the second closest points, you would take index 1, etc.
+    closest = indices[0]
+    closest_dist = distances[0]
+
+    # Return indices and distances
+    return (closest, closest_dist)
+
+def compute_tp_fp_fn(labels, preds, buffer=10):
     """Obtain the true positives, false positives and false negatives
 
     Args:
         labels (dataframe): Dataframe containing the valid labels points
         preds (dataframe): Dataframe containing the predicted points
+        buffer (int): Buffer to apply to the labels
 
     Returns:
         tp, fp,fn (ints): True positives, false positives and false negatives
     """
-    import ipdb
+    labels.to_crs(preds.crs, inplace=True)
+    preds.reset_index(inplace=True)
+    labels.reset_index(inplace=True)
 
-    ipdb.set_trace()
-    preds.set_crs(labels.crs, inplace=True)
-    found_points = gpd.sjoin(preds, labels)
+    
+    pred_data = preds.centroid.apply(lambda row: (row.xy[0][0],row.xy[1][0] )).to_list()
+    true_data = labels.geometry.apply(lambda row: (row.xy[0][0],row.xy[1][0] )).to_list()
 
-    tp = found_points.shape[0]
-    fp = preds.shape[0] - tp
-    fn = labels.shape[0] - tp
-    return tp, fp, fn
+    closest, dist = get_nearest(src_points=pred_data, candidates=true_data)
+    closest_points = labels.loc[closest]
+    
+    closest_points['dist'] = dist
+    closest_points['label_index'] = closest_points.index.tolist()
+    closest_points['gt_labels'] = closest
+    closest_points = closest_points.reset_index(drop=True) 
 
+    # sort by distance and drop duplicates
+    precision_tp_strict = closest_points.sort_values(by='dist',ascending=True).drop_duplicates('gt_labels')
+    precision_tp_strict = precision_tp_strict[precision_tp_strict.dist<buffer].shape[0]
+    fp_strict = closest_points.shape[0] - precision_tp_strict
+
+    recall_tp = precision_tp_strict
+    fn = labels.shape[0] - recall_tp
+
+    return precision_tp_strict, recall_tp,  fp_strict, fn
 
 def model_performance(label_fn, preds_fn, image_fn, noise_threshold=1, buffer=10):
     """Compute the model performance for each image
@@ -119,17 +154,17 @@ def model_performance(label_fn, preds_fn, image_fn, noise_threshold=1, buffer=10
         buffer (int, optional): _description_. Defaults to 10.
     """
     preds = polygonize(preds_fn, noise_threshold=noise_threshold)
-    valid_labels = get_valid_labels(image_fn, label_fn, buffer=buffer)
-    tp, fp, fn = compute_tp_fp_fn(valid_labels, preds)
+    valid_labels = get_valid_labels(image_fn, label_fn)
+    precision_tp, recall_tp,  fp, fn = compute_tp_fp_fn(valid_labels, preds,buffer)
+    precision = precision_tp/(precision_tp+fp)
+    recall = recall_tp/(recall_tp+fn)
+    f1 = 2*precision*recall/(precision+recall)
 
     print(f"File: {image_fn}")
-    print(f"True Positives: {tp}")
-    print(f"False Positives: {fp}")
-    print(f"False Negatives: {fn}")
-    print(f"Precision: {tp/(tp+fp)}")
-    print(f"Recall: {tp/(tp+fn)}")
-    print(f"F1: {2*tp/(2*tp+fp+fn)}")
-    return tp, fp, fn
+    print("Precision: {:.2f}".format(precision))
+    print("Recall: {:.2f}".format(recall))
+    print("F1: {:.2f}".format(f1))
+    return precision, recall, f1
 
 
 def main(config):
