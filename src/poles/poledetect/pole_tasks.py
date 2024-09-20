@@ -140,7 +140,7 @@ class SemanticSegmentationTask(LightningModule):
         for i in range(y_hat.shape[0]):
             loss += self.loss(y[i], y_hat[i].sigmoid()).nanmean()
         loss = loss / y_hat.shape[0]
-        self.log("val_loss", loss, on_step=False, on_epoch=True,prog_bar=True)
+        self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=True)
 
         y_hat_hard = y_hat.sigmoid()
         probs = y_hat.sigmoid().detach().cpu().numpy()

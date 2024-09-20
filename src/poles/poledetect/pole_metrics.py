@@ -58,9 +58,9 @@ def get_valid_labels(image_fn, label_fn):
         point_labels (dataframe): Dataframe containing valid labels within the image
     """
     src = rasterio.open(image_fn)
-    msk = src.read() #img_fp.read_masks() 
+    msk = src.read()  # img_fp.read_masks()
     src_crs = src.crs
-    data_msk  = ((msk[0]>0) & (msk[1]>0) & (msk[2]>0)).astype(int) 
+    data_msk = ((msk[0] > 0) & (msk[1] > 0) & (msk[2] > 0)).astype(int)
 
     valid_labels = []
     with fiona.open(label_fn, "r") as shapefile:
@@ -72,16 +72,19 @@ def get_valid_labels(image_fn, label_fn):
         for shape in shapes:
             pt = Point(shape["coordinates"])
 
-            point =  transform.transform(dst_crs,src_crs, [shape["coordinates"][0]],[shape["coordinates"][1]])
-            point = Point(point[0][0],point[1][0])
+            point = transform.transform(
+                dst_crs, src_crs, [shape["coordinates"][0]], [shape["coordinates"][1]]
+            )
+            point = Point(point[0][0], point[1][0])
 
             if geom.contains(point):
-                lon, lat = point.xy 
+                lon, lat = point.xy
                 py, px = src.index(lon, lat)
                 if data_msk[py, px] == 1:
                     valid_labels.append(pt)
     valid_labels = gpd.GeoDataFrame(crs=dst_crs, geometry=valid_labels)
-    return valid_labels 
+    return valid_labels
+
 
 def get_nearest(src_points, candidates, k_neighbors=1):
     """
@@ -89,7 +92,7 @@ def get_nearest(src_points, candidates, k_neighbors=1):
     Find nearest neighbors for all source points from a set of candidate points"""
 
     # Create tree from the candidate points
-    tree = BallTree(candidates, leaf_size=15, metric='euclidean')
+    tree = BallTree(candidates, leaf_size=15, metric="euclidean")
 
     # Find closest points and distances
     distances, indices = tree.query(src_points, k=k_neighbors)
@@ -106,6 +109,7 @@ def get_nearest(src_points, candidates, k_neighbors=1):
     # Return indices and distances
     return (closest, closest_dist)
 
+
 def compute_tp_fp_fn(labels, preds, buffer=10):
     """Obtain the true positives, false positives and false negatives
 
@@ -121,27 +125,33 @@ def compute_tp_fp_fn(labels, preds, buffer=10):
     preds.reset_index(inplace=True)
     labels.reset_index(inplace=True)
 
-    
-    pred_data = preds.centroid.apply(lambda row: (row.xy[0][0],row.xy[1][0] )).to_list()
-    true_data = labels.geometry.apply(lambda row: (row.xy[0][0],row.xy[1][0] )).to_list()
+    pred_data = preds.centroid.apply(lambda row: (row.xy[0][0], row.xy[1][0])).to_list()
+    true_data = labels.geometry.apply(
+        lambda row: (row.xy[0][0], row.xy[1][0])
+    ).to_list()
 
     closest, dist = get_nearest(src_points=pred_data, candidates=true_data)
     closest_points = labels.loc[closest]
-    
-    closest_points['dist'] = dist
-    closest_points['label_index'] = closest_points.index.tolist()
-    closest_points['gt_labels'] = closest
-    closest_points = closest_points.reset_index(drop=True) 
+
+    closest_points["dist"] = dist
+    closest_points["label_index"] = closest_points.index.tolist()
+    closest_points["gt_labels"] = closest
+    closest_points = closest_points.reset_index(drop=True)
 
     # sort by distance and drop duplicates
-    precision_tp_strict = closest_points.sort_values(by='dist',ascending=True).drop_duplicates('gt_labels')
-    precision_tp_strict = precision_tp_strict[precision_tp_strict.dist<buffer].shape[0]
+    precision_tp_strict = closest_points.sort_values(
+        by="dist", ascending=True
+    ).drop_duplicates("gt_labels")
+    precision_tp_strict = precision_tp_strict[precision_tp_strict.dist < buffer].shape[
+        0
+    ]
     fp_strict = closest_points.shape[0] - precision_tp_strict
 
     recall_tp = precision_tp_strict
     fn = labels.shape[0] - recall_tp
 
-    return precision_tp_strict, recall_tp,  fp_strict, fn
+    return precision_tp_strict, recall_tp, fp_strict, fn
+
 
 def model_performance(label_fn, preds_fn, image_fn, noise_threshold=1, buffer=10):
     """Compute the model performance for each image
@@ -155,10 +165,10 @@ def model_performance(label_fn, preds_fn, image_fn, noise_threshold=1, buffer=10
     """
     preds = polygonize(preds_fn, noise_threshold=noise_threshold)
     valid_labels = get_valid_labels(image_fn, label_fn)
-    precision_tp, recall_tp,  fp, fn = compute_tp_fp_fn(valid_labels, preds,buffer)
-    precision = precision_tp/(precision_tp+fp)
-    recall = recall_tp/(recall_tp+fn)
-    f1 = 2*precision*recall/(precision+recall)
+    precision_tp, recall_tp, fp, fn = compute_tp_fp_fn(valid_labels, preds, buffer)
+    precision = precision_tp / (precision_tp + fp)
+    recall = recall_tp / (recall_tp + fn)
+    f1 = 2 * precision * recall / (precision + recall)
 
     print(f"File: {image_fn}")
     print("Precision: {:.2f}".format(precision))

@@ -48,8 +48,8 @@ def create_and_save_mask(
             matches_shapes.append(warped_shape)
             matches_types.append(types[idx])
 
-    label_data = np.zeros((height, width),dtype="uint8")
-    data_mask = np.zeros((height, width),dtype="uint8")
+    label_data = np.zeros((height, width), dtype="uint8")
+    data_mask = np.zeros((height, width), dtype="uint8")
     for i, (lon, lat) in enumerate(matches_shapes):
         py, px = img_fp.index(lon, lat)
         data_mask[py, px] = 1
