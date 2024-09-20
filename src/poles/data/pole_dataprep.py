@@ -31,6 +31,8 @@ def create_and_save_mask(
     """
     print(f"Working on image: {img_fn}")
     img_fp = rasterio.open(os.path.join(img_fn), "r")
+    _, height, width = img_fp.read().shape
+    profile = img_fp.profile.copy()
     img_crs = img_fp.crs
     bounds = img_fp.bounds
     geom = box(*bounds)
@@ -46,19 +48,19 @@ def create_and_save_mask(
             matches_shapes.append(warped_shape)
             matches_types.append(types[idx])
 
-    label_data = np.zeros((img_fp.read().shape[1], img_fp.read().shape[2]))
-    data_mask = np.zeros((img_fp.read().shape[1], img_fp.read().shape[2]))
+    label_data = np.zeros((height, width),dtype="uint8")
+    data_mask = np.zeros((height, width),dtype="uint8")
     for i, (lon, lat) in enumerate(matches_shapes):
         py, px = img_fp.index(lon, lat)
         data_mask[py, px] = 1
         if matches_types[i] == "pole":
             label_data[py, px] = 1
 
-    output_profile = img_fp.profile.copy()
+    output_profile = profile
     output_profile["dtype"] = "uint8"
     output_profile["count"] = 1
 
-    mask_profile = img_fp.profile.copy()
+    mask_profile = profile
     mask_profile["dtype"] = "uint8"
     mask_profile["count"] = 1
     # Save the generated mask
