@@ -113,7 +113,7 @@ class SemanticSegmentationTask(LightningModule):
         pred_count = torch.tensor(pred_count)
         true_count = ((y) != 0).sum(axis=[1, 2]).detach().cpu().type(torch.FloatTensor)
 
-        self.log("train_loss", loss, on_step=True, on_epoch=False)
+        self.log("train_loss", loss, on_step=True, on_epoch=False, prog_bar=True)
         self.train_metrics(pred_count, true_count)
 
         return cast(Tensor, loss)
@@ -140,7 +140,7 @@ class SemanticSegmentationTask(LightningModule):
         for i in range(y_hat.shape[0]):
             loss += self.loss(y[i], y_hat[i].sigmoid()).nanmean()
         loss = loss / y_hat.shape[0]
-        self.log("val_loss", loss, on_step=False, on_epoch=True)
+        self.log("val_loss", loss, on_step=False, on_epoch=True, prog_bar=True)
 
         y_hat_hard = y_hat.sigmoid()
         probs = y_hat.sigmoid().detach().cpu().numpy()

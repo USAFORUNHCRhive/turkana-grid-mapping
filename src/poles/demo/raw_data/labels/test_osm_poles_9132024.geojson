@@ -1,0 +1,29 @@
+{
+"type": "FeatureCollection",
+"name": "test_osm_poles_9132024",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "fid": 1, "element_type": "node", "osmid": 11026665990, "material": null, "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.740472127985718, 3.757872783422448 ] } },
+{ "type": "Feature", "properties": { "fid": 2, "element_type": "node", "osmid": 11026665991, "material": null, "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.740738578076083, 3.758358953906483 ] } },
+{ "type": "Feature", "properties": { "fid": 3, "element_type": "node", "osmid": 11026665992, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.739288041231248, 3.7580258 ] } },
+{ "type": "Feature", "properties": { "fid": 4, "element_type": "node", "osmid": 11026665993, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.7395005, 3.7583917 ] } },
+{ "type": "Feature", "properties": { "fid": 5, "element_type": "node", "osmid": 11026665994, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.7397029, 3.7587277 ] } },
+{ "type": "Feature", "properties": { "fid": 6, "element_type": "node", "osmid": 11026672639, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.7410695, 3.7619187 ] } },
+{ "type": "Feature", "properties": { "fid": 7, "element_type": "node", "osmid": 11026672640, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.7405559, 3.7609813 ] } },
+{ "type": "Feature", "properties": { "fid": 8, "element_type": "node", "osmid": 11026672641, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.7400275, 3.7600271 ] } },
+{ "type": "Feature", "properties": { "fid": 9, "element_type": "node", "osmid": 11026672642, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.7396533, 3.7593393 ] } },
+{ "type": "Feature", "properties": { "fid": 10, "element_type": "node", "osmid": 11026672643, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.7399638, 3.759166 ] } },
+{ "type": "Feature", "properties": { "fid": 11, "element_type": "node", "osmid": 11026672644, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.7403715, 3.7589418 ] } },
+{ "type": "Feature", "properties": { "fid": 12, "element_type": "node", "osmid": 11026672645, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.7408456, 3.7586889 ] } },
+{ "type": "Feature", "properties": { "fid": 13, "element_type": "node", "osmid": 11026672647, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.74126889707653, 3.758673830737459 ] } },
+{ "type": "Feature", "properties": { "fid": 14, "element_type": "node", "osmid": 11026672648, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.741112158941981, 3.758755827901863 ] } },
+{ "type": "Feature", "properties": { "fid": 15, "element_type": "node", "osmid": 11026672649, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.740742745428598, 3.758941777026325 ] } },
+{ "type": "Feature", "properties": { "fid": 16, "element_type": "node", "osmid": 11026672650, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.740456547710643, 3.759100876002025 ] } },
+{ "type": "Feature", "properties": { "fid": 17, "element_type": "node", "osmid": 11026672651, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.740193590767085, 3.759239502247255 ] } },
+{ "type": "Feature", "properties": { "fid": 18, "element_type": "node", "osmid": 11026672652, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.7397825072347, 3.759457230209207 ] } },
+{ "type": "Feature", "properties": { "fid": 19, "element_type": "node", "osmid": 11026672653, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.73973011864588, 3.759483594804109 ] } },
+{ "type": "Feature", "properties": { "fid": 20, "element_type": "node", "osmid": 11026672654, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.7389251, 3.7599616 ] } },
+{ "type": "Feature", "properties": { "fid": 21, "element_type": "node", "osmid": 11026672655, "material": "wood", "power": "pole", "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.738297134042838, 3.760330452967663 ] } },
+{ "type": "Feature", "properties": { "fid": null, "element_type": null, "osmid": null, "material": null, "power": null, "type": "pole" }, "geometry": { "type": "Point", "coordinates": [ 34.741197346280714, 3.758493343678088 ] } }
+]
+}
