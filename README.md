@@ -3,7 +3,9 @@
 
 Mapping electrical infrastructure can support measuring access to electricity and can help identify opportunities to improve or extend exisiting power infrastructure.
 High resolution orthorectified imagery (such as drone imagery) can be used to map power distribution infrastructure. The figure below shows a sample power distribution network
-that can be mapped using this repository. Here, power infrastructure mapping across the distribution network is done by i) detecting electrical poles and ii) segmenting power distribution lines.
+that can be mapped using this repository. Here, power infrastructure mapping across the distribution network is done by:
+1) Detecting electrical poles
+2) Segmenting power distribution lines
 
 ![Examples of power infrastructure](src/figures/power_infrastructure_examples.png)
 
@@ -11,10 +13,15 @@ that can be mapped using this repository. Here, power infrastructure mapping acr
 
 Clone this repo and install the conda environment
 ```
+git clone <REPO-URL>
 cd <REPO-NAME>
 conda env create -f environment.yml
 conda activate gridmapper
 ```
+Requirements:
+- Linux recommended (environment includes Linux-specific packages).
+- NVIDIA GPU with CUDA 11.7 (8GB+ VRAM recommended).
+- For CPU-only users or Windows/Mac users, see Tips in the tutorial for adjustments to the environment.
 
 ### Directory Structure
 ```
@@ -23,6 +30,9 @@ conda activate gridmapper
 ├── LICENSE.md
 ├── README.md
 ├── TUTORIAL.md
+├── CODE_OF_CONDUCT.md
+├── CONTRIBUTING.md
+├── SECURITY.md
 └── src
     ├── figures
     │   └── power_infrastructure_examples.png
@@ -70,9 +80,9 @@ collected by USA for UNHCR and the Humanitarian OpenStreetMap Team:
 azcopy copy --recursive <AZURE_BLOB_URL> <DESTINATION_PATH>
 ```
 
-The downloaded raw data folder contains `power_infrastructure_demo` data that can be used to follow the sample [tutorial](TUTORIAL.md).
+3. The downloaded raw data folder contains `power_infrastructure_demo` data that can be used to follow the sample [tutorial](TUTORIAL.md).
 
-3. After downloading the data, set the right paths in the config files as described in the tutorial.
+4. After downloading the data, set the right paths in the config files (src/poles/pole_config.yaml, src/lines/line_config.yaml) as described in the tutorial.
 
 ## Sample Tutorial
 A sample tutorial walking through the project can be found in [TUTORIAL.md](TUTORIAL.md).
@@ -87,3 +97,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## Contributing
 
 If you're interested in contributing to this project check out the [contributing guide](CONTRIBUTING.md) for more details. We also welcome ideas for other ways to contribute - please reach out to hive@unrefugees.org.
+
