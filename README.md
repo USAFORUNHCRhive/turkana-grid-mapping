@@ -21,7 +21,6 @@ conda activate gridmapper
 Requirements:
 - Linux recommended (environment includes Linux-specific packages).
 - NVIDIA GPU with CUDA 11.7 (8GB+ VRAM recommended).
-- For CPU-only users or Windows/Mac users, see Tips in the tutorial for adjustments to the environment.
 
 ### Directory Structure
 ```
@@ -97,4 +96,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## Contributing
 
 If you're interested in contributing to this project check out the [contributing guide](CONTRIBUTING.md) for more details. We also welcome ideas for other ways to contribute - please reach out to hive@unrefugees.org.
+
 
